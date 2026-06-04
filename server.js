@@ -15,6 +15,27 @@ app.get("/user",(req,res)=>{
   })
 })
 
+app.get("/dice",(req,res)=>{
+  const roll = Math.floor(Math.random()*6)+1;
+
+  res.json({
+    roll:roll
+  })
+})
+
+app.get("/coinflip",(req,res)=>{
+  const win = Math.random()>0.45;
+  let coin;
+  if (win){
+    coin = "Heads";
+  }
+  else {
+    coin = "Tails";
+  }
+  res.json({
+    Coin:coin
+  })
+})
 app.listen(PORT,()=>{
   console.log( `Server running on ${PORT}`)
 });
