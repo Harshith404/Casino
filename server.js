@@ -4,43 +4,57 @@ const app = express();
 app.use(express.json());
 const PORT = 3500;
 
+const users = {
+  harshith: {
+    balance:1000
+  }
+}
+
+app.get("/user/:username",(req,res)=>{
+  const username = req.params.username;
+  if (!users[username])
+  {
+    return res.json({
+      "error":"User not found"
+    })
+  }
+  res.json({
+    balance:users[username].balance
+  });
+});
+
 app.get("/",(req,res)=>{
   res.send("Casino Backend Running");
 });
 
-/* app.get("/user",(req,res)=>{
-  res.json({
-      username:"harshith",
-      balance:1000
-  })
-})
-
-app.get("/dice",(req,res)=>{
-  const roll = Math.floor(Math.random()*6)+1;
-
-  res.json({
-    roll:roll
-  })
-})
- */
-/* app.get("/coinflip",(req,res)=>{
-  const win = Math.random()>0.45;
-  let coin;
-  if (win){
-    coin = "Heads";
-  }
-  else {
-    coin = "Tails";
-  }
-  res.json({
-    Coin:coin
-  })
-}) */
-
 app.post("/coinflip",(req,res)=>{
-
+  const username = req.body.username;
+  if (!users[username]) {
+  return res.json({
+    error: "User not found"
+  });
+}
   const bet = req.body.bet;
+  if(typeof(bet)!=="number")
+  { 
+    return res.json({
+       "error" : "Bet must be a number"
+      })
+    }
+  
+  if(bet<=0)
+  {
+    return  res.json({
+      "error":"Bet must be greater than 0"
+    })
+  }
   const guess = req.body.guess;
+  if(guess!=="Heads" && guess!=="Tails")
+  {
+    return res.json({
+      "error":"Guess must be Heads or Tails "
+    })
+  }
   const coin = Math.random();
   let face;
   if (coin>0.5){
@@ -50,19 +64,40 @@ app.post("/coinflip",(req,res)=>{
     face="Tails";
   }
   if(guess===face){
+    users[username].balance+=bet;
     res.json({
       "won":true,
       "coin":face,
-      "profit":bet
+      "profit":bet,
+      "balance":users[username].balance
     })
   }
     else{
+      users[username].balance-=bet;
       res.json({
         "won":false,
         "coin":face,
-        "profit":-bet
+        "profit":-bet,
+        "balance":users[username].balance
       })
     }
+})
+
+app.post("/register", (req,res)=>{
+  const username = req.body.username;
+  if (users[username])
+  {
+    return res.json({
+      "error":"User already exists"
+    })
+  }
+  users[username]= {
+    balance:1000
+  }
+  res.json({
+    "message":"User created"
+  })
+  
 })
 
 app.listen(PORT,()=>{
