@@ -102,6 +102,73 @@ app.post("/register", (req,res)=>{
   
 })
 
+app.post("/deposit",(req,res)=>{
+  const username = req.body.username;
+  if(!users[username])
+  {
+    return res.json(
+      {
+        "error" : "User not found"
+      }
+    )
+  }
+
+  const amount = req.body.amount;
+  if(typeof(amount)!=="number")
+  {
+    return res.json({
+      "error":"Amount must be number"
+    })
+  }
+  if(amount<=0)
+  {
+    return res.json({
+      "error":"Amount must be greater than 0"
+    })
+  }
+  users[username].balance += amount;
+  fs.writeFileSync("users.json",JSON.stringify(users,null,2));
+  return res.json({
+    "message":"Deposit successful",
+    "balance":users[username].balance
+  })
+})
+
+app.post("/withdraw",(req,res)=>{
+  const username = req.body.username;
+  if(!users[username])
+  {
+    return res.json({
+      "error" : "Username not found"
+    })
+  }
+  const amount = req.body.amount;
+  if(typeof(amount)!=="number")
+  {
+    return res.json({
+      "error" : "Amount should be a number"
+    })
+  }
+  if(amount<=0)
+  {
+    return res.json({
+      "error" : "Amount should be greater than 0"
+    })
+  }
+  if(amount>users[username].balance)
+  {
+    return res.json({
+      "error" : "Insufficient Balance"
+    })
+  }
+  users[username].balance -= amount;
+  fs.writeFileSync("users.json", JSON.stringify(users,null,2));
+  res.json({
+    "message":"Amount Withdraw Successful",
+    "Balance":users[username].balance
+  })
+
+})
 app.listen(PORT,()=>{
   console.log( `Server running on ${PORT}`)
 });
