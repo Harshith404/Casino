@@ -1,14 +1,13 @@
 const express = require("express");
-
+const fs = require("fs");
 const app = express();
 app.use(express.json());
 const PORT = 3500;
 
-const users = {
-  harshith: {
-    balance:1000
-  }
-}
+const users = JSON.parse(
+  fs.readFileSync("users.json","utf8")
+);
+console.log(users);
 
 app.get("/user/:username",(req,res)=>{
   const username = req.params.username;
@@ -65,6 +64,7 @@ app.post("/coinflip",(req,res)=>{
   }
   if(guess===face){
     users[username].balance+=bet;
+    fs.writeFileSync("users.json",JSON.stringify(users, null,2));
     res.json({
       "won":true,
       "coin":face,
@@ -74,6 +74,7 @@ app.post("/coinflip",(req,res)=>{
   }
     else{
       users[username].balance-=bet;
+      fs.writeFileSync("users.json",JSON.stringify(users, null,2));
       res.json({
         "won":false,
         "coin":face,
@@ -94,6 +95,7 @@ app.post("/register", (req,res)=>{
   users[username]= {
     balance:1000
   }
+  fs.writeFileSync("users.json",JSON.stringify(users, null,2));
   res.json({
     "message":"User created"
   })
