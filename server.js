@@ -1,3 +1,15 @@
+const mongoose = require("mongoose");
+const MONGO_URI = "mongodb+srv://Harshith:Harshith404@cluster0.kkay17y.mongodb.net/?appName=Cluster0"
+mongoose.connect(MONGO_URI)
+.then(() => {
+    console.log("MongoDB Connected");
+})
+.catch((err) => {
+    console.log(err);
+});
+
+const User = require("./models/User");
+
 const express = require("express");
 const fs = require("fs");
 const app = express();
@@ -94,18 +106,22 @@ app.post("/coinflip",(req,res)=>{
     }
 })
 
-app.post("/register", (req,res)=>{
+app.post("/register", async (req,res)=>{
   const username = req.body.username;
-  if (users[username])
+  const user = await User.findOne({
+  username:username
+})
+  if (user)
   {
     return res.json({
       "error":"User already exists"
     })
   }
-  users[username]= {
+  const newUser = new User({
+    username:username,
     balance:1000
-  }
-  saveUsers();
+  })
+  await newUser.save();
   res.json({
     "message":"User created"
   })
