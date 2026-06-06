@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const MONGO_URI = "mongodb+srv://Harshith:Harshith404@cluster0.kkay17y.mongodb.net/?appName=Cluster0"
+const MONGO_URI =
+"mongodb://Harshith:Harshith404@ac-g2i75ed-shard-00-00.kkay17y.mongodb.net:27017,ac-g2i75ed-shard-00-01.kkay17y.mongodb.net:27017,ac-g2i75ed-shard-00-02.kkay17y.mongodb.net:27017/?ssl=true&replicaSet=atlas-p5472p-shard-0&authSource=admin&appName=Cluster0";
 mongoose.connect(MONGO_URI)
 .then(() => {
     console.log("MongoDB Connected");
@@ -31,16 +32,19 @@ function userExists(username) {
   return !!users[username];
 }
 
-app.get("/user/:username",(req,res)=>{
+app.get("/user/:username",async (req,res)=>{
   const username = req.params.username;
-  if(!userExists(username))
+  const user = await User.findOne({
+    username:username
+  })
+  if(!user)
   {
     return res.json({
       "error":"User not found"
     })
   }
   res.json({
-    balance:users[username].balance
+    balance:user.balance
   });
 });
 
@@ -48,9 +52,10 @@ app.get("/",(req,res)=>{
   res.send("Casino Backend Running");
 });
 
-app.post("/coinflip",(req,res)=>{
+app.post("/coinflip",async (req,res)=>{
   const username = req.body.username;
-  if(!userExists(username)) {
+  const user = await User.findOne({username:username});
+  if(!user) {
   return res.json({
     error: "User not found"
   });
@@ -69,6 +74,12 @@ app.post("/coinflip",(req,res)=>{
       "error":"Bet must be greater than 0"
     })
   }
+  if(bet > user.balance)
+{
+  return res.json({
+    error: "Insufficient Balance"
+  });
+}
   const guess = req.body.guess;
   if(guess!=="Heads" && guess!=="Tails")
   {
@@ -85,23 +96,23 @@ app.post("/coinflip",(req,res)=>{
     face="Tails";
   }
   if(guess===face){
-    users[username].balance+=bet;
-    saveUsers();
+    user.balance+=bet;
+    await user.save();
     res.json({
       "won":true,
       "coin":face,
       "profit":bet,
-      "balance":users[username].balance
+      "balance":user.balance
     })
   }
     else{
-      users[username].balance-=bet;
-      saveUsers();
+      user.balance-=bet;
+      await user.save();
       res.json({
         "won":false,
         "coin":face,
         "profit":-bet,
-        "balance":users[username].balance
+        "balance":user.balance
       })
     }
 })
@@ -128,9 +139,12 @@ app.post("/register", async (req,res)=>{
   
 })
 
-app.post("/deposit",(req,res)=>{
+app.post("/deposit",async (req,res)=>{
   const username = req.body.username;
-  if(!userExists(username))
+  const user = await User.findOne({
+    username:username
+  })
+  if(!user)
   {
     return res.json(
       {
@@ -152,17 +166,21 @@ app.post("/deposit",(req,res)=>{
       "error":"Amount must be greater than 0"
     })
   }
-  users[username].balance += amount;
-  saveUsers();
+  user.balance += amount;
+  await user.save();
+
   return res.json({
     "message":"Deposit successful",
-    "balance":users[username].balance
+    "balance":user.balance
   })
 })
 
-app.post("/withdraw",(req,res)=>{
+app.post("/withdraw",async (req,res)=>{
   const username = req.body.username;
-  if(!userExists(username))
+  const user = await User.findOne({
+    username:username
+  })
+  if(!user)
   {
     return res.json({
       "error" : "Username not found"
@@ -181,34 +199,26 @@ app.post("/withdraw",(req,res)=>{
       "error" : "Amount should be greater than 0"
     })
   }
-  if(amount>users[username].balance)
+  if(amount>user.balance)
   {
     return res.json({
       "error" : "Insufficient Balance"
     })
   }
-  users[username].balance -= amount;
-  saveUsers();
+  user.balance -= amount;
+  await user.save();
   res.json({
     "message":"Amount Withdraw Successful",
-    "Balance":users[username].balance
+    "Balance":user.balance
   })
 
 })
 
-app.get("/leaderboard",(req,res)=>{
-    const entries = Object.entries(users);
-    const leaderboard = entries.map((entry)=>{
-      return {
-        username: entry[0],
-        balance: entry[1].balance
-      }
+app.get("/leaderboard",async (req,res)=>{
+    const user = await User.find().sort({
+      balance:-1
     });
-
-    const sorted = leaderboard.sort((a,b)=>{
-      return b.balance-a.balance;
-    });
-    res.json(sorted);
+    res.json(user);
   })
 app.listen(PORT,()=>{
   console.log( `Server running on ${PORT}`)
