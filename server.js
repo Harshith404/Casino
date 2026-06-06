@@ -12,25 +12,10 @@ mongoose.connect(MONGO_URI)
 const User = require("./models/User");
 
 const express = require("express");
-const fs = require("fs");
+
 const app = express();
 app.use(express.json());
 const PORT = 3500;
-
-const users = JSON.parse(
-  fs.readFileSync("users.json","utf8")
-);
-
-function saveUsers() {
-  fs.writeFileSync(
-    "users.json",
-    JSON.stringify(users, null, 2)
-  );
-}
-
-function userExists(username) {
-  return !!users[username];
-}
 
 app.get("/user/:username",async (req,res)=>{
   const username = req.params.username;
