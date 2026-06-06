@@ -7,11 +7,21 @@ const PORT = 3500;
 const users = JSON.parse(
   fs.readFileSync("users.json","utf8")
 );
-console.log(users);
+
+function saveUsers() {
+  fs.writeFileSync(
+    "users.json",
+    JSON.stringify(users, null, 2)
+  );
+}
+
+function userExists(username) {
+  return !!users[username];
+}
 
 app.get("/user/:username",(req,res)=>{
   const username = req.params.username;
-  if (!users[username])
+  if(!userExists(username))
   {
     return res.json({
       "error":"User not found"
@@ -28,7 +38,7 @@ app.get("/",(req,res)=>{
 
 app.post("/coinflip",(req,res)=>{
   const username = req.body.username;
-  if (!users[username]) {
+  if(!userExists(username)) {
   return res.json({
     error: "User not found"
   });
@@ -64,7 +74,7 @@ app.post("/coinflip",(req,res)=>{
   }
   if(guess===face){
     users[username].balance+=bet;
-    fs.writeFileSync("users.json",JSON.stringify(users, null,2));
+    saveUsers();
     res.json({
       "won":true,
       "coin":face,
@@ -74,7 +84,7 @@ app.post("/coinflip",(req,res)=>{
   }
     else{
       users[username].balance-=bet;
-      fs.writeFileSync("users.json",JSON.stringify(users, null,2));
+      saveUsers();
       res.json({
         "won":false,
         "coin":face,
@@ -95,7 +105,7 @@ app.post("/register", (req,res)=>{
   users[username]= {
     balance:1000
   }
-  fs.writeFileSync("users.json",JSON.stringify(users, null,2));
+  saveUsers();
   res.json({
     "message":"User created"
   })
@@ -104,7 +114,7 @@ app.post("/register", (req,res)=>{
 
 app.post("/deposit",(req,res)=>{
   const username = req.body.username;
-  if(!users[username])
+  if(!userExists(username))
   {
     return res.json(
       {
@@ -127,7 +137,7 @@ app.post("/deposit",(req,res)=>{
     })
   }
   users[username].balance += amount;
-  fs.writeFileSync("users.json",JSON.stringify(users,null,2));
+  saveUsers();
   return res.json({
     "message":"Deposit successful",
     "balance":users[username].balance
@@ -136,7 +146,7 @@ app.post("/deposit",(req,res)=>{
 
 app.post("/withdraw",(req,res)=>{
   const username = req.body.username;
-  if(!users[username])
+  if(!userExists(username))
   {
     return res.json({
       "error" : "Username not found"
@@ -162,7 +172,7 @@ app.post("/withdraw",(req,res)=>{
     })
   }
   users[username].balance -= amount;
-  fs.writeFileSync("users.json", JSON.stringify(users,null,2));
+  saveUsers();
   res.json({
     "message":"Amount Withdraw Successful",
     "Balance":users[username].balance
