@@ -169,6 +169,21 @@ app.post("/withdraw",(req,res)=>{
   })
 
 })
+
+app.get("/leaderboard",(req,res)=>{
+    const entries = Object.entries(users);
+    const leaderboard = entries.map((entry)=>{
+      return {
+        username: entry[0],
+        balance: entry[1].balance
+      }
+    });
+
+    const sorted = leaderboard.sort((a,b)=>{
+      return b.balance-a.balance;
+    });
+    res.json(sorted);
+  })
 app.listen(PORT,()=>{
   console.log( `Server running on ${PORT}`)
 });
