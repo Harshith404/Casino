@@ -1,6 +1,6 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const MONGO_URI =
-"mongodb://Harshith:Harshith404@ac-g2i75ed-shard-00-00.kkay17y.mongodb.net:27017,ac-g2i75ed-shard-00-01.kkay17y.mongodb.net:27017,ac-g2i75ed-shard-00-02.kkay17y.mongodb.net:27017/?ssl=true&replicaSet=atlas-p5472p-shard-0&authSource=admin&appName=Cluster0";
+const MONGO_URI =process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
 .then(() => {
     console.log("MongoDB Connected");
