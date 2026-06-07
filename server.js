@@ -10,15 +10,40 @@ mongoose.connect(MONGO_URI)
 });
 
 const User = require("./models/User");
-
 const express = require("express");
-
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const app = express();
 app.use(express.json());
 const PORT = 3500;
 
-app.get("/user/:username",async (req,res)=>{
-  const username = req.params.username;
+function auth(req,res,next)
+{
+  const token = req.body.token;
+  if(!token)
+{
+    return res.json({
+        error: "Token required"
+    });
+}
+try{
+  const decoded = jwt.verify(
+    token,
+    process.env.JWT_SECRET
+);
+  req.user = decoded;
+  next();
+}
+catch(err)
+{
+  return res.json({
+    error:"Invalid token"
+  })
+}
+}
+
+app.post("/user",auth,async (req,res)=>{
+  const username = req.user.username;
   const user = await User.findOne({
     username:username
   })
@@ -37,8 +62,8 @@ app.get("/",(req,res)=>{
   res.send("Casino Backend Running");
 });
 
-app.post("/coinflip",async (req,res)=>{
-  const username = req.body.username;
+app.post("/coinflip",auth,async (req,res)=>{
+  const username = req.user.username;
   const user = await User.findOne({username:username});
   if(!user) {
   return res.json({
@@ -104,6 +129,14 @@ app.post("/coinflip",async (req,res)=>{
 
 app.post("/register", async (req,res)=>{
   const username = req.body.username;
+  const password = req.body.password;
+  if(!password)
+  {
+    return res.json({
+      error:"Password is required"
+    });
+  }
+  const hashedPassword = await bcrypt.hash(password,10);
   const user = await User.findOne({
   username:username
 })
@@ -115,6 +148,7 @@ app.post("/register", async (req,res)=>{
   }
   const newUser = new User({
     username:username,
+    password:hashedPassword,
     balance:1000
   })
   await newUser.save();
@@ -123,9 +157,49 @@ app.post("/register", async (req,res)=>{
   })
   
 })
-
-app.post("/deposit",async (req,res)=>{
+app.post("/login",async (req,res)=>{
   const username = req.body.username;
+  const password = req.body.password;
+  const user = await User.findOne({
+    username:username
+  })
+  if(!user)
+  {
+    return res.json({
+      error:"Invalid username or password"
+    })
+  }
+  const validPassword = await bcrypt.compare(
+    password,user.password
+  )
+  if(!validPassword)
+  {
+    return res.json({
+      error:"Invalid username or password"
+    })
+  }
+  const token = jwt.sign({
+    username:user.username
+  },
+process.env.JWT_SECRET,
+{
+  expiresIn:"1h"
+});
+  res.json({
+  message: "Login successful",
+  token:token
+});
+})
+
+app.post("/secret",auth,(req,res)=>{
+  res.json({
+    message:"Secret route",
+    user:req.user
+  });
+});
+
+app.post("/deposit",auth,async (req,res)=>{
+  const username = req.user.username;
   const user = await User.findOne({
     username:username
   })
@@ -160,8 +234,8 @@ app.post("/deposit",async (req,res)=>{
   })
 })
 
-app.post("/withdraw",async (req,res)=>{
-  const username = req.body.username;
+app.post("/withdraw",auth,async (req,res)=>{
+  const username = req.user.username;
   const user = await User.findOne({
     username:username
   })
