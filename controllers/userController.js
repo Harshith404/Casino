@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const Transaction = require("../models/Transaction");
 async function loginUser(req,res)
 {
   const username = req.body.username;
@@ -25,7 +25,8 @@ async function loginUser(req,res)
       })
     }
     const token = jwt.sign({
-      username:user.username
+      username:user.username,
+      role:user.role
     },
   process.env.JWT_SECRET,
   {
@@ -60,7 +61,8 @@ async function registerUser(req,res)
   const newUser = new User({
     username:username,
     password:hashedPassword,
-    balance:1000
+    balance:1000,
+    role:"user"
   })
   await newUser.save();
   res.json({
@@ -133,6 +135,12 @@ async function coinFlip(req,res)
     if(guess===face){
       user.balance+=bet;
       await user.save();
+      await Transaction.create({
+            username: username,
+            type: "coinflip-win",
+            amount: bet,
+            balanceAfter: user.balance
+        });
       res.json({
         "won":true,
         "coin":face,
@@ -143,6 +151,12 @@ async function coinFlip(req,res)
       else{
         user.balance-=bet;
         await user.save();
+        await Transaction.create({
+            username: username,
+            type: "coinflip-loss",
+            amount: bet,
+            balanceAfter: user.balance
+        });
         res.json({
           "won":false,
           "coin":face,
@@ -182,7 +196,12 @@ async function deposit(req,res)
     }
     user.balance += amount;
     await user.save();
-  
+    await Transaction.create({
+      username:username,
+      type:"deposit",
+      amount:amount,
+      balanceAfter:user.balance
+    });
     return res.json({
       "message":"Deposit successful",
       "balance":user.balance
@@ -222,6 +241,12 @@ async function withdraw(req,res)
     }
     user.balance -= amount;
     await user.save();
+    await Transaction.create({
+      username:username,
+      type:"withdraw",
+      amount:amount,
+      balanceAfter:user.balance
+    });
     res.json({
       "message":"Amount Withdraw Successful",
       "Balance":user.balance
@@ -236,6 +261,25 @@ async function leaderboard(req,res)
     });
     res.json(user);
 }
+
+async function getTransactions(req,res)
+{
+    const username = req.user.username;
+    const transactions =
+        await Transaction.find({
+            username: username
+        }).sort({
+            createdAt: -1
+        });
+
+    res.json(transactions);
+}
+
+async function getAllUsers(req,res)
+{
+    const users = await User.find();
+    res.json(users);
+}
 module.exports = {
   loginUser,
   registerUser,
@@ -243,5 +287,7 @@ module.exports = {
   coinFlip,
   deposit,
   withdraw,
-  leaderboard
+  leaderboard,
+  getTransactions,
+  getAllUsers
 };

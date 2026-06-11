@@ -1,7 +1,8 @@
-
+const jwt = require("jsonwebtoken");
 function auth(req,res,next)
 {
   const authHeader = req.headers.authorization;
+  console.log(authHeader)
   if(!authHeader)
   {
     return res.json({
@@ -15,7 +16,7 @@ function auth(req,res,next)
     });
   }
 
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.trim().split(/\s+/)[1];
   if(!token)
 {
     return res.json({
@@ -32,6 +33,7 @@ try{
 }
 catch(err)
 {
+  console.log(err);
   return res.json({
     error:"Invalid token"
   })
