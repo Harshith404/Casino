@@ -1,5 +1,4 @@
-import {useState} from 'react';
-import {useEffect} from 'react';
+import {useState, useEffect} from 'react';
 function App()
 { const [username,setUsername] = useState("");
   const [password,setPassword] = useState("");
@@ -8,8 +7,39 @@ function App()
   const [isLoggedIn,setIsLoggedIn] = useState(
   !!localStorage.getItem("token")
 );
+  const [balance,setBalance] = useState(0);
+  const [amount,setAmount] = useState("");
+useEffect(() => {
+  async function fetchUser()
+  {
+    const token = localStorage.getItem("token");
 
-useEffect(() => {console.log("App Loaded");},[]);
+    if(!token)
+    {
+      return;
+    }
+
+    const response = await fetch(
+      "https://casino-ubcn.onrender.com/user",
+      {
+        method:"POST",
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+
+    setUsername(data.username);
+    setBalance(data.balance);
+  }
+
+  fetchUser();
+},[]);
+
   async function handlelogin()
   { if(!username || !password)
   { setMessage("");
@@ -43,12 +73,53 @@ useEffect(() => {console.log("App Loaded");},[]);
   localStorage.removeItem("token");
   setIsLoggedIn(false);
 }
+
+  async function handleDeposit()
+  {
+    const token = localStorage.getItem("token");
+
+    if(!token)
+    {
+      return;
+    }
+      const response = await fetch(
+      "https://casino-ubcn.onrender.com/deposit",
+      {
+        method:"POST",
+        headers:{
+          Authorization: `Bearer ${token}`,
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({ amount: Number(amount)})
+        }
+    );
+
+    const data = await response.json();
+    if(data.error)
+    {
+      setError(data.error);
+      return;
+    }
+    setBalance(data.balance);
+    setAmount("");
+
+  }
   if(isLoggedIn)
   {
     return(
     <div>
       <h1>Welcome {username}</h1>
+      <h2>Balance: {balance}</h2>
+      <p>Deposit: </p>
+      <input
+            placeholder="Amount"
+            value={amount}
+            onChange={(event)=>setAmount(event.target.value)}
+      />
+      <button onClick={handleDeposit}>Deposit</button>
+      <br></br>
       <button onClick={handleLogout}>Logout</button>
+      <p>{error}</p>
     </div>
 
     );
