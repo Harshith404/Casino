@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {useEffect} from 'react';
 function App()
 { const [username,setUsername] = useState("");
   const [password,setPassword] = useState("");
@@ -7,6 +8,8 @@ function App()
   const [isLoggedIn,setIsLoggedIn] = useState(
   !!localStorage.getItem("token")
 );
+
+useEffect(() => {console.log("App Loaded");},[]);
   async function handlelogin()
   { if(!username || !password)
   { setMessage("");
@@ -52,6 +55,7 @@ function App()
   }
   return (
     <div>
+      
       <p>Username: </p>
       <input placeholder="Username" value={username} onChange={(event)=>{setUsername(event.target.value)}}/>
       <br></br>

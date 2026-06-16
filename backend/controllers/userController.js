@@ -84,6 +84,7 @@ async function getUser(req,res)
       })
     }
     res.json({
+      username:user.username,
       balance:user.balance
     });
 }
