@@ -250,7 +250,7 @@ async function withdraw(req,res)
     });
     res.json({
       "message":"Amount Withdraw Successful",
-      "Balance":user.balance
+      "balance":user.balance
     })
   
 }

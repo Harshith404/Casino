@@ -14,7 +14,7 @@ const {
     getAllUsers
 } = require("../controllers/userController");
 
-router.post("/deposit",auth,deposit)
+router.post("/deposit",auth,deposit);
 router.post("/withdraw",auth,withdraw);
 router.get("/leaderboard",leaderboard);
 router.post("/coinflip",auth,coinFlip);
