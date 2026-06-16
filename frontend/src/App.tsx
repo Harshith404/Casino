@@ -8,7 +8,8 @@ function App()
   !!localStorage.getItem("token")
 );
   const [balance,setBalance] = useState(0);
-  const [amount,setAmount] = useState("");
+  const [depositAmount,setDepositAmount] = useState("");
+const [withdrawAmount,setWithdrawAmount] = useState("");
 useEffect(() => {
   async function fetchUser()
   {
@@ -90,7 +91,7 @@ useEffect(() => {
           Authorization: `Bearer ${token}`,
           "Content-Type":"application/json"
         },
-        body: JSON.stringify({ amount: Number(amount)})
+        body: JSON.stringify({ amount: Number(depositAmount)})
         }
     );
 
@@ -101,8 +102,38 @@ useEffect(() => {
       return;
     }
     setBalance(data.balance);
-    setAmount("");
+    setDepositAmount("");
+    setError("");
+  }
+    async function handleWithdraw()
+  {
+    const token = localStorage.getItem("token");
 
+    if(!token)
+    {
+      return;
+    }
+      const response = await fetch(
+      "https://casino-ubcn.onrender.com/withdraw",
+      {
+        method:"POST",
+        headers:{
+          Authorization: `Bearer ${token}`,
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({ amount: Number(withdrawAmount)})
+        }
+    );
+
+    const data = await response.json();
+    if(data.error)
+    {
+      setError(data.error);
+      return;
+    }
+    setBalance(data.balance);
+    setWithdrawAmount("");
+    setError("");
   }
   if(isLoggedIn)
   {
@@ -113,10 +144,18 @@ useEffect(() => {
       <p>Deposit: </p>
       <input
             placeholder="Amount"
-            value={amount}
-            onChange={(event)=>setAmount(event.target.value)}
+            value={depositAmount}
+            onChange={(event)=>setDepositAmount(event.target.value)}
       />
       <button onClick={handleDeposit}>Deposit</button>
+      <br></br>
+      <p>Withdraw: </p>
+      <input
+            placeholder="Amount"
+            value={withdrawAmount}
+            onChange={(event)=>setWithdrawAmount(event.target.value)}
+      />
+      <button onClick={handleWithdraw}>Withdraw</button>
       <br></br>
       <button onClick={handleLogout}>Logout</button>
       <p>{error}</p>
