@@ -7,7 +7,7 @@ import {
   Routes,
   Route
 } from 'react-router-dom'
-
+import ProtectedRoute from "./ProtectedRoute";
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -20,8 +20,20 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/history" element={<History />} />
+        <Route path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+        <Route path="/history"
+        element={
+          <ProtectedRoute>
+            <History />
+          </ProtectedRoute>
+        }
+      />
         <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </BrowserRouter>
