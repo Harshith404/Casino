@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login()
@@ -7,7 +7,14 @@ function Login()
     const [error,setError] = useState("");
     const [message,setMessage] = useState("");
     const navigate = useNavigate();
-  
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if(token)
+    {
+        navigate("/dashboard");
+    }
+}, [navigate]);
   async function handlelogin()
   { if(!username || !password)
   { setMessage("");
