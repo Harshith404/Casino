@@ -10,14 +10,6 @@ function Dashboard()
     const [coinResult,setCoinResult] = useState("");
     const [profit,setProfit] = useState(0);
     const [won,setWon] = useState("");
-    type Transaction = {
-    _id: string;
-    username: string;
-    type: string;
-    amount: number;
-    balanceAfter: number;
-    };
-    const [transactions,setTransactions] = useState<Transaction[]>([]);
     const [error,setError] = useState("");
     const navigate = useNavigate();
     
@@ -170,30 +162,6 @@ function Dashboard()
   }
 
 
-  async function fetchTransactions(){
-    const token = localStorage.getItem("token");
-
-    if(!token)
-    {
-      return;
-    }
-
-    const response = await fetch(
-      "https://casino-ubcn.onrender.com/transactions",
-      {
-        method:"GET",
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      }
-    );
-
-    const data  = await response.json();
-
-    setTransactions(data);
-    console.log(transactions);
-  }
-
     function handleLogout()
     {
         localStorage.removeItem("token");
@@ -235,23 +203,9 @@ function Dashboard()
       <p>Coin Result: {coinResult}</p>
       <p>Profit: {profit>0?"+":""}{profit}</p>
       <p>{won}</p>
-      <button onClick={fetchTransactions}>Show Transactions</button>
-      
-      {
-  transactions.map((transaction) => (
-    <div key={transaction._id}>
-  <p>
-    {transaction.type}
-    {" | "}
-    Amount: {transaction.amount}
-    {" | "}
-    Balance: {transaction.balanceAfter}
-  </p>
-  <hr />
-    </div>
-  ))
-}
-
+      <button onClick={() => navigate("/history")}>
+      View History
+      </button>
       <br></br>
       <br></br>
       <button onClick={handleLogout}>Logout</button>
