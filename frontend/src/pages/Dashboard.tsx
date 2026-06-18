@@ -1,31 +1,27 @@
 import {useState, useEffect} from 'react';
-function App()
-{ const [username,setUsername] = useState("");
-  const [password,setPassword] = useState("");
-  const [error,setError] = useState("");
-  const [message,setMessage] = useState("");
-  const [isLoggedIn,setIsLoggedIn] = useState(
-  !!localStorage.getItem("token")
-);
-  const [balance,setBalance] = useState(0);
-  const [depositAmount,setDepositAmount] = useState("");
-const [withdrawAmount,setWithdrawAmount] = useState("");
-const [guess,setGuess] = useState("");
-const [betAmount,setBetAmount] = useState("");
-const [coinResult,setCoinResult] = useState("");
-const [profit,setProfit] = useState(0);
-const [won,setWon] = useState("");
-type Transaction = {
-  _id: string;
-  username: string;
-  type: string;
-  amount: number;
-  balanceAfter: number;
-};
-const [transactions,setTransactions] = useState<Transaction[]>([]);
-
-
-useEffect(() => {
+import { useNavigate } from 'react-router-dom';
+function Dashboard()
+{   const [username,setUsername] = useState("");
+    const [balance,setBalance] = useState(0);
+    const [depositAmount,setDepositAmount] = useState("");
+    const [withdrawAmount,setWithdrawAmount] = useState("");
+    const [guess,setGuess] = useState("");
+    const [betAmount,setBetAmount] = useState("");
+    const [coinResult,setCoinResult] = useState("");
+    const [profit,setProfit] = useState(0);
+    const [won,setWon] = useState("");
+    type Transaction = {
+    _id: string;
+    username: string;
+    type: string;
+    amount: number;
+    balanceAfter: number;
+    };
+    const [transactions,setTransactions] = useState<Transaction[]>([]);
+    const [error,setError] = useState("");
+    const navigate = useNavigate();
+    
+    useEffect(() => {
   async function fetchUser()
   {
     const token = localStorage.getItem("token");
@@ -56,41 +52,9 @@ useEffect(() => {
   fetchUser();
 },[]);
 
-/*  async function handlelogin()
-  { if(!username || !password)
-  { setMessage("");
-    setError("Please enter Username and Password");
-    return;
-  }
-    setError("");
-    const response = await fetch(
-  "https://casino-ubcn.onrender.com/login",{method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      username: username,
-      password: password
-    })
-  }
-);  
-    const data = await response.json();
-    if(data.token){
-    localStorage.setItem("token",data.token);
-      setMessage(data.message)
-      setIsLoggedIn(true);
-    setError("");}
-    else{
-      setMessage("");
-      setError(data.error);
-    }
-  }*/
 
-   function handleLogout()
-{
-  localStorage.removeItem("token");
-  setIsLoggedIn(false);
-}
 
-  async function handleDeposit()
+     async function handleDeposit()
   {
     const token = localStorage.getItem("token");
 
@@ -230,11 +194,14 @@ useEffect(() => {
     console.log(transactions);
   }
 
+    function handleLogout()
+    {
+        localStorage.removeItem("token");
+        navigate("/");
+    }
 
-  if(isLoggedIn)
-  {
-    return(
-    <div>
+    return (
+        <div>
       <h1>Welcome {username}</h1>
       <h2>Balance: {balance}</h2>
       <p>Deposit: </p>
@@ -290,28 +257,7 @@ useEffect(() => {
       <button onClick={handleLogout}>Logout</button>
       <p>{error}</p>
     </div>
-
     );
-  }
-  /*return (
-    <div>
-      
-      <p>Username: </p>
-      <input placeholder="Username" value={username} onChange={(event)=>{setUsername(event.target.value)}}/>
-      <br></br>
-      <p>Password: </p>
-       <input placeholder="Password" type="password" value={password} onChange={(event)=>{setPassword(event.target.value)}}/>
-       <br></br>
-      <button onClick={()=>{setUsername("");
-        setPassword("");
-        setError("");
-        setMessage("");
-        }}>Clear</button>
-      <button onClick={handlelogin}>Login</button>
-      <p>{error}</p>
-      <p>{message}</p>
-    </div>
-  );*/
 }
 
-export default App;
+export default Dashboard;
