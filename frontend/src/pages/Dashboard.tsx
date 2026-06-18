@@ -172,6 +172,15 @@ function Dashboard()
         <div>
       <h1>Welcome {username}</h1>
       <h2>Balance: {balance}</h2>
+      <br></br>
+       <button onClick={() => navigate("/history")}>
+      History
+      </button>
+        <button onClick={() => navigate("/leaderboard")}>
+        Leaderboard
+      </button>
+      <br></br>
+      <br></br>
       <p>Deposit: </p>
       <input
             placeholder="Amount"
@@ -203,9 +212,6 @@ function Dashboard()
       <p>Coin Result: {coinResult}</p>
       <p>Profit: {profit>0?"+":""}{profit}</p>
       <p>{won}</p>
-      <button onClick={() => navigate("/history")}>
-      View History
-      </button>
       <br></br>
       <br></br>
       <button onClick={handleLogout}>Logout</button>

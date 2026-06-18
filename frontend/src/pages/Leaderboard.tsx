@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 type User ={
     _id:string;
     username:string;
@@ -7,7 +7,7 @@ type User ={
 };
 
 function Leaderboard()
-{   
+{   const navigate= useNavigate();
     const [users,setUsers] = useState<User[]>([]);
 
     async function fetchLeaderboard(){
@@ -28,6 +28,15 @@ function Leaderboard()
     return (
     <div>
         <h1>Leaderboard</h1>
+        <button onClick={() => navigate("/dashboard")}>
+          Dashboard
+        </button>
+
+        <button onClick={() => navigate("/history")}>
+            History
+        </button>
+        <br></br>
+        <br></br>
      {
       users.map((user,index) => (
         <div key={user._id}>

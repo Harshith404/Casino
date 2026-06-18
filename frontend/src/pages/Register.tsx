@@ -36,16 +36,12 @@ function Register()
     }
     }
     return (<div>
-        <h1>Register Page</h1>
+        <h1>Register</h1>
         <p>Username:</p>
         <input placeholder="Username"value = {username} onChange={(event)=>setUsername(event.target.value)}/>
         <br></br>
         <p>Password:</p>
         <input type="password" placeholder="Password"value = {password} onChange={(event)=>setPassword(event.target.value)}/>
-        <br></br>
-        <p>{error}</p>
-        <br></br>
-        <p>{message}</p>
         <br></br>
         <br></br>
         <button onClick={() => {
@@ -55,6 +51,10 @@ function Register()
             setMessage("");
         }}>Clear</button>
         <button onClick={handleRegister}>Register</button>
+        <button onClick={() => navigate("/")}>Back To Login</button>
+        <br></br>
+        <p>{error}</p>
+        <p>{message}</p>
     </div>);
 }
 

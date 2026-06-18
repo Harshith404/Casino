@@ -44,12 +44,14 @@ function Login()
       <p>Password: </p>
        <input placeholder="Password" type="password" value={password} onChange={(event)=>{setPassword(event.target.value)}}/>
        <br></br>
+       <br></br>
       <button onClick={()=>{setUsername("");
         setPassword("");
         setError("");
         setMessage("");
         }}>Clear</button>
       <button onClick={handlelogin}>Login</button>
+      <button onClick={() => navigate("/register")}>Register</button>
       <p>{error}</p>
       <p>{message}</p>
     </div>

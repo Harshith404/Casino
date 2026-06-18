@@ -1,6 +1,7 @@
 import {useState,useEffect} from 'react';
+import { useNavigate } from "react-router-dom";
 function History()
-{   
+{   const navigate = useNavigate();
      async function fetchTransactions(){
     const token = localStorage.getItem("token");
 
@@ -39,7 +40,13 @@ function History()
     return (
   <div>
     <h1>Transaction History</h1>
+      <button onClick={() => navigate("/dashboard")}>
+      Dashboard
+      </button>
 
+      <button onClick={() => navigate("/leaderboard")}>
+      Leaderboard
+      </button>
     {
       transactions.map((transaction) => (
         <div key={transaction._id}>
