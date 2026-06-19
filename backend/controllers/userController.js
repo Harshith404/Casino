@@ -11,7 +11,7 @@ async function loginUser(req,res)
     })
     if(!user)
     {
-      return res.json({
+      return res.status(401).json({
         error:"Invalid username or password"
       })
     }
@@ -20,7 +20,7 @@ async function loginUser(req,res)
     )
     if(!validPassword)
     {
-      return res.json({
+      return res.status(401).json({
         error:"Invalid username or password"
       })
     }
@@ -43,7 +43,7 @@ async function registerUser(req,res)
   const password = req.body.password;
   if(!password)
   {
-    return res.json({
+    return res.status(400).json({
       error:"Password is required"
     });
   }
@@ -53,7 +53,7 @@ async function registerUser(req,res)
 })
   if (user)
   {
-    return res.json({
+    return res.status(409).json({
       "error":"User already exists"
     })
   }
@@ -86,27 +86,27 @@ const username = user.username;
     const bet = req.body.bet;
     if(typeof(bet)!=="number")
     { 
-      return res.json({
+      return res.status(400).json({
          "error" : "Bet must be a number"
         })
       }
     
     if(bet<=0)
     {
-      return  res.json({
+      return  res.status(400).json({
         "error":"Bet must be greater than 0"
       })
     }
     if(bet > user.balance)
   {
-    return res.json({
+    return res.status(400).json({
       error: "Insufficient Balance"
     });
   }
     const guess = req.body.guess;
     if(guess!=="Heads" && guess!=="Tails")
     {
-      return res.json({
+      return res.status(400).json({
         "error":"Guess must be Heads or Tails "
       })
     }
@@ -159,13 +159,13 @@ async function deposit(req,res)
     const amount = req.body.amount;
     if(typeof(amount)!=="number")
     {
-      return res.json({
+      return res.status(400).json({
         "error":"Amount must be number"
       })
     }
     if(amount<=0)
     {
-      return res.json({
+      return res.status(400).json({
         "error":"Amount must be greater than 0"
       })
     }
@@ -190,19 +190,19 @@ async function withdraw(req,res)
     const amount = req.body.amount;
     if(typeof(amount)!=="number")
     {
-      return res.json({
+      return res.status(400).json({
         "error" : "Amount should be a number"
       })
     }
     if(amount<=0)
     {
-      return res.json({
+      return res.status(400).json({
         "error" : "Amount should be greater than 0"
       })
     }
     if(amount>user.balance)
     {
-      return res.json({
+      return res.status(400).json({
         "error" : "Insufficient Balance"
       })
     }
