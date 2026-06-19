@@ -11,6 +11,7 @@ function Dashboard()
     const [profit,setProfit] = useState(0);
     const [won,setWon] = useState("");
     const [error,setError] = useState("");
+    const [role,setRole] = useState("");
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -36,7 +37,7 @@ function Dashboard()
     const data = await response.json();
 
     console.log(data);
-
+    setRole(data.role);
     setUsername(data.username);
     setBalance(data.balance);
   }
@@ -172,6 +173,11 @@ function Dashboard()
         <div>
       <h1>Welcome {username}</h1>
       <h2>Balance: {balance}</h2>
+      {role === "admin" && (
+  <button onClick={() => navigate("/admin")}>
+    Admin Panel
+  </button>
+)}
       <br></br>
        <button onClick={() => navigate("/history")}>
       History

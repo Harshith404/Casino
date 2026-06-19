@@ -25,8 +25,7 @@ async function loginUser(req,res)
       })
     }
     const token = jwt.sign({
-      username:user.username,
-      role:user.role
+      userId:user._id
     },
   process.env.JWT_SECRET,
   {
