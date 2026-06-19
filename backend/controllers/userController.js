@@ -72,32 +72,17 @@ async function registerUser(req,res)
 
 async function getUser(req,res)
 {
-  const username = req.user.username;
-    const user = await User.findOne({
-      username:username
-    })
-    if(!user)
-    {
-      return res.json({
-        "error":"User not found"
-      })
-    }
     res.json({
-      username:user.username,
-      balance:user.balance,
-      role:user.role
+        username:req.user.username,
+        balance:req.user.balance,
+        role:req.user.role
     });
 }
 
 async function coinFlip(req,res)
 {
-  const username = req.user.username;
-    const user = await User.findOne({username:username});
-    if(!user) {
-    return res.json({
-      error: "User not found"
-    });
-  }
+  const user = req.user;
+const username = user.username;
     const bet = req.body.bet;
     if(typeof(bet)!=="number")
     { 
@@ -169,19 +154,8 @@ async function coinFlip(req,res)
 
 async function deposit(req,res)
 {
-   const username = req.user.username;
-    const user = await User.findOne({
-      username:username
-    })
-    if(!user)
-    {
-      return res.json(
-        {
-          "error" : "User not found"
-        }
-      )
-    }
-  
+    const user = req.user;
+    const username = user.username;
     const amount = req.body.amount;
     if(typeof(amount)!=="number")
     {
@@ -211,16 +185,8 @@ async function deposit(req,res)
 
 async function withdraw(req,res)
 {
-  const username = req.user.username;
-    const user = await User.findOne({
-      username:username
-    })
-    if(!user)
-    {
-      return res.json({
-        "error" : "Username not found"
-      })
-    }
+  const user = req.user;
+  const username = user.username;
     const amount = req.body.amount;
     if(typeof(amount)!=="number")
     {
