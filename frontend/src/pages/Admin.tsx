@@ -1,5 +1,5 @@
 import { useState,useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 type User = {
     _id: string;
     username: string;
@@ -9,13 +9,9 @@ type User = {
 
 function Admin()
 {   const [users,setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
    async function fetchAdminUsers(){
         const token = localStorage.getItem("token");
-
-    if(!token)
-    {
-      return;
-    }
 
           const response = await fetch(
         "https://casino-ubcn.onrender.com/admin/users",
@@ -26,9 +22,8 @@ function Admin()
         }
         }
       );
-  
       const data  = await response.json();
-  
+      
       setUsers(data);
     }    
       

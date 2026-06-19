@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard'
 import History from './pages/History'
 import Leaderboard from './pages/Leaderboard'
 import Admin from './pages/Admin'
+import AdminRoute from "./AdminRoute";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -35,8 +36,14 @@ createRoot(document.getElementById('root')!).render(
           </ProtectedRoute>
         }
       />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/leaderboard" element={<Leaderboard/>} />
+        <Route path="/admin" 
+        element={
+          <AdminRoute>
+            <Admin />
+          </AdminRoute>
+        }
+/>
       </Routes>
     </BrowserRouter>
   </StrictMode>
