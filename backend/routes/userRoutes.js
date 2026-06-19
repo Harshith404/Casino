@@ -8,7 +8,7 @@ const {
     deposit,
     withdraw,
     coinFlip,
-    getUser,
+    getMe,
     leaderboard,
     getTransactions,
     getAllUsers
@@ -20,7 +20,7 @@ router.get("/leaderboard",leaderboard);
 router.post("/coinflip",auth,coinFlip);
 router.post("/register", registerUser);
 router.post("/login",loginUser);
-router.post("/user",auth,getUser);
+router.get("/me",auth,getMe);
 router.get("/transactions",auth,getTransactions);
 router.get(
     "/admin/users",

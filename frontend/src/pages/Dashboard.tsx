@@ -25,9 +25,9 @@ function Dashboard()
     }
 
     const response = await fetch(
-      "https://casino-ubcn.onrender.com/user",
+      "https://casino-ubcn.onrender.com/me",
       {
-        method:"POST",
+        method:"GET",
         headers:{
           Authorization: `Bearer ${token}`
         }

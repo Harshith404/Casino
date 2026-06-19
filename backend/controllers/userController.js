@@ -70,7 +70,7 @@ async function registerUser(req,res)
   
 }
 
-async function getUser(req,res)
+async function getMe(req,res)
 {
     res.json({
         username:req.user.username,
@@ -250,7 +250,7 @@ async function getAllUsers(req,res)
 module.exports = {
   loginUser,
   registerUser,
-  getUser,
+  getMe,
   coinFlip,
   deposit,
   withdraw,
