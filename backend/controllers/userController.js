@@ -247,6 +247,25 @@ async function getAllUsers(req,res)
     const users = await User.find();
     res.json(users);
 }
+
+async function getAdminStats(req,res)
+{
+    const totalUsers = await User.countDocuments();
+    const users = await User.find();
+    const totalMoney = users.reduce(
+        (sum,user) => sum + user.balance,
+        0
+    );
+    const richestUser = await User.findOne()
+        .sort({ balance: -1 });
+    res.json({
+        totalUsers,
+        totalMoney,
+        richestUser: richestUser.username,
+        richestBalance: richestUser.balance
+    });
+}
+
 module.exports = {
   loginUser,
   registerUser,
@@ -256,5 +275,6 @@ module.exports = {
   withdraw,
   leaderboard,
   getTransactions,
-  getAllUsers
+  getAllUsers,
+  getAdminStats
 };

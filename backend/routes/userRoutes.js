@@ -11,7 +11,8 @@ const {
     getMe,
     leaderboard,
     getTransactions,
-    getAllUsers
+    getAllUsers,
+    getAdminStats
 } = require("../controllers/userController");
 
 router.post("/deposit",auth,deposit);
@@ -28,5 +29,10 @@ router.get(
     admin,
     getAllUsers
 );
-
+router.get(
+    "/admin/stats",
+    auth,
+    admin,
+    getAdminStats
+);
 module.exports = router;
