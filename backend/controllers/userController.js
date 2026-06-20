@@ -251,11 +251,18 @@ async function getAllUsers(req,res)
 async function getAdminStats(req,res)
 {
     const totalUsers = await User.countDocuments();
-    const users = await User.find();
-    const totalMoney = users.reduce(
-        (sum,user) => sum + user.balance,
-        0
-    );
+    const result = await User.aggregate([
+    {
+        $group:{
+            _id:null,
+            totalMoney:{
+                $sum:"$balance"
+            }
+        }
+    }
+]);
+
+const totalMoney = result[0].totalMoney;
     const richestUser = await User.findOne()
         .sort({ balance: -1 });
     res.json({
