@@ -15,9 +15,12 @@ import History from './pages/History'
 import Leaderboard from './pages/Leaderboard'
 import Admin from './pages/Admin'
 import AdminRoute from "./AdminRoute";
+import Profile from "./pages/Profile";
+import { AuthProvider } from "./context/AuthContext";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+     <AuthProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -44,7 +47,14 @@ createRoot(document.getElementById('root')!).render(
           </AdminRoute>
         }
 />
+        <Route path="/profile" element={
+        <ProtectedRoute>
+            <Profile />
+        </ProtectedRoute>
+    }
+/>
       </Routes>
     </BrowserRouter>
+   </AuthProvider> 
   </StrictMode>
 )

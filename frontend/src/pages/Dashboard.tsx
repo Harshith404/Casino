@@ -1,8 +1,9 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 function Dashboard()
-{   const [username,setUsername] = useState("");
-    const [balance,setBalance] = useState(0);
+{   
+   
     const [depositAmount,setDepositAmount] = useState("");
     const [withdrawAmount,setWithdrawAmount] = useState("");
     const [guess,setGuess] = useState("");
@@ -11,40 +12,12 @@ function Dashboard()
     const [profit,setProfit] = useState(0);
     const [won,setWon] = useState("");
     const [error,setError] = useState("");
-    const [role,setRole] = useState("");
     const navigate = useNavigate();
-    
-    useEffect(() => {
-  async function fetchUser()
-  {
-    const token = localStorage.getItem("token");
-
-    if(!token)
+    const {user,setUser} = useAuth();
+    if(!user)
     {
-      return;
+        return <h1>Loading...</h1>;
     }
-
-    const response = await fetch(
-      "https://casino-ubcn.onrender.com/me",
-      {
-        method:"GET",
-        headers:{
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    console.log(data);
-    setRole(data.role);
-    setUsername(data.username);
-    setBalance(data.balance);
-  }
-
-  fetchUser();
-},[]);
-
 
 
      async function handleDeposit()
@@ -73,7 +46,11 @@ function Dashboard()
       setError(data.error);
       return;
     }
-    setBalance(data.balance);
+    setUser({
+    username: user!.username,
+    role: user!.role,
+    balance: data.balance
+});
     setDepositAmount("");
     setError("");
   }
@@ -103,7 +80,11 @@ function Dashboard()
       setError(data.error);
       return;
     }
-    setBalance(data.balance);
+    setUser({
+    username: user!.username,
+    role: user!.role,
+    balance: data.balance
+});
     setWithdrawAmount("");
     setError("");
   }
@@ -148,7 +129,11 @@ function Dashboard()
     }
     setCoinResult(data.coin);
     setProfit(data.profit);
-    setBalance(data.balance);
+   setUser({
+    username: user!.username,
+    role: user!.role,
+    balance: data.balance
+});
     setBetAmount("");
     setError("");
     setGuess("");
@@ -171,9 +156,9 @@ function Dashboard()
 
     return (
         <div>
-      <h1>Welcome {username}</h1>
-      <h2>Balance: {balance}</h2>
-      {role === "admin" && (
+      <h1>Welcome {user.username}</h1>
+      <h2>Balance: {user.balance}</h2>
+      {user.role === "admin" && (
   <button onClick={() => navigate("/admin")}>
     Admin Panel
   </button>
@@ -184,6 +169,9 @@ function Dashboard()
       </button>
         <button onClick={() => navigate("/leaderboard")}>
         Leaderboard
+      </button>
+      <button onClick={() => navigate("/profile")}>
+        Profile
       </button>
       <br></br>
       <br></br>
