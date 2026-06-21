@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axios";
 function Dashboard()
 {   
    
@@ -21,136 +22,123 @@ function Dashboard()
 
 
      async function handleDeposit()
-  {
-    const token = localStorage.getItem("token");
-
-    if(!token)
+{
+    try
     {
-      return;
-    }
-      const response = await fetch(
-      "https://casino-ubcn.onrender.com/deposit",
-      {
-        method:"POST",
-        headers:{
-          Authorization: `Bearer ${token}`,
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({ amount: Number(depositAmount)})
-        }
-    );
+        const response = await api.post(
+            "/deposit",
+            {
+                amount:Number(depositAmount)
+            }
+        );
 
-    const data = await response.json();
-    if(data.error)
+        setUser({
+            ...user!,
+            balance:response.data.balance
+        });
+
+        setDepositAmount("");
+        setError("");
+    }
+    catch(error:any)
     {
-      setError(data.error);
-      return;
+        setError(
+            error.response?.data?.error
+            || "Deposit failed"
+        );
     }
-    setUser({
-    username: user!.username,
-    role: user!.role,
-    balance: data.balance
-});
-    setDepositAmount("");
-    setError("");
-  }
-    async function handleWithdraw()
-  {
-    const token = localStorage.getItem("token");
+}
 
-    if(!token)
+
+   async function handleWithdraw()
+{
+    try
     {
-      return;
-    }
-      const response = await fetch(
-      "https://casino-ubcn.onrender.com/withdraw",
-      {
-        method:"POST",
-        headers:{
-          Authorization: `Bearer ${token}`,
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({ amount: Number(withdrawAmount)})
-        }
-    );
+        const response = await api.post(
+            "/withdraw",
+            {
+                amount:Number(withdrawAmount)
+            }
+        );
 
-    const data = await response.json();
-    if(data.error)
+        setUser({
+            ...user!,
+            balance:response.data.balance
+        });
+
+        setWithdrawAmount("");
+        setError("");
+    }
+    catch(error:any)
     {
-      setError(data.error);
-      return;
+        setError(
+            error.response?.data?.error
+            || "Withdraw failed"
+        );
     }
-    setUser({
-    username: user!.username,
-    role: user!.role,
-    balance: data.balance
-});
-    setWithdrawAmount("");
-    setError("");
-  }
-
+}
 
   async function handleCoinFlip()
-  {
-    const token = localStorage.getItem("token");
-    if(!token)
-    {
-      return;
-    }
+{
     if(guess === "")
     {
-      setError("Guess to Flip a Coin");
-      setWon("");
-      setCoinResult("");
-      setProfit(0);
-      return;
+        setError("Guess to Flip a Coin");
+        setWon("");
+        setCoinResult("");
+        setProfit(0);
+        return;
     }
-    const response = await fetch(
-      "https://casino-ubcn.onrender.com/coinflip",
-      {
-        method:"POST",
-        headers:{
-          Authorization: `Bearer ${token}`,
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({ bet: Number(betAmount),
-          guess: guess
-        })
-        }
-    );
-    const data = await response.json();
-    if(data.error)
+
+    try
     {
-      setError(data.error);
-      setWon("");
-      setCoinResult("");
-      setProfit(0);
-      return;
-    }
-    setCoinResult(data.coin);
-    setProfit(data.profit);
-   setUser({
-    username: user!.username,
-    role: user!.role,
-    balance: data.balance
-});
-    setBetAmount("");
-    setError("");
-    setGuess("");
-     if(data.won=== true)
-          {
+        const response = await api.post(
+            "/coinflip",
+            {
+                bet:Number(betAmount),
+                guess:guess
+            }
+        );
+
+        const data = response.data;
+
+        setCoinResult(data.coin);
+        setProfit(data.profit);
+        setUser({
+            ...user!,
+            balance:data.balance
+        });
+
+        setBetAmount("");
+        setError("");
+        setGuess("");
+
+        if(data.won)
+        {
             setWon("YOU WON");
-          }
-          if(data.won === false)
-          {
+        }
+        else
+        {
             setWon("YOU LOST");
-          }
-  }
+        }
+    }
+    catch(error:any)
+    {
+        setError(
+            error.response?.data?.error
+            || "Coin Flip failed"
+        );
+
+        setWon("");
+        setCoinResult("");
+        setProfit(0);
+    }
+}
 
 
     function handleLogout()
     {
         localStorage.removeItem("token");
+        setUser(null);
         navigate("/");
     }
 

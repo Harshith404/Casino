@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 type User ={
     _id:string;
     username:string;
@@ -10,20 +11,20 @@ function Leaderboard()
 {   const navigate= useNavigate();
     const [users,setUsers] = useState<User[]>([]);
 
-    async function fetchLeaderboard(){
+    async function fetchLeaderboard()
+{
+    try
+    {
+        const response =
+        await api.get("/leaderboard");
 
-        const response = await fetch(
-      "https://casino-ubcn.onrender.com/leaderboard",
-      {
-        method:"GET",
-      }
-    );
-
-    const data  = await response.json();
-
-    setUsers(data);
-  }    
-    
+        setUsers(response.data);
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+}
     useEffect(() => {fetchLeaderboard();}, []);
     return (
     <div>

@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import api from "../api/axios";
 function Login()
   { const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
@@ -22,25 +22,24 @@ function Login()
     return;
   }
     setError("");
-    const response = await fetch(
-  "https://casino-ubcn.onrender.com/login",{method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      username: username,
-      password: password
-    })
-  }
-);  
-    const data = await response.json();
-    if(data.token){
+   try
+{
+    const response = await api.post(
+        "/login",
+        {username,password}
+    );
+    const data = response.data;
     localStorage.setItem("token",data.token);
+
     setMessage(data.message);
     setError("");
-    navigate("/dashboard");}
-    else{
-      setMessage("");
-      setError(data.error);
-    }
+    navigate("/dashboard");
+}
+catch(error:any)
+{
+    setMessage("");
+    setError(error.response?.data?.error || "Login failed");
+}
   }
   return (
      <div>

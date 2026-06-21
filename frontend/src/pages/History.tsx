@@ -1,29 +1,22 @@
 import {useState,useEffect} from 'react';
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 function History()
 {   const navigate = useNavigate();
-     async function fetchTransactions(){
-    const token = localStorage.getItem("token");
-
-    if(!token)
+     async function fetchTransactions()
+{
+    try
     {
-      return;
+        const response =
+        await api.get("/transactions");
+
+        setTransactions(response.data);
     }
-
-    const response = await fetch(
-      "https://casino-ubcn.onrender.com/transactions",
-      {
-        method:"GET",
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      }
-    );
-
-    const data  = await response.json();
-
-    setTransactions(data);
-  }    
+    catch(error)
+    {
+        console.log(error);
+    }
+}
 
     useEffect(() => {
         fetchTransactions();

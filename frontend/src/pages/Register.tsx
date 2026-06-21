@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from "../api/axios";
 function Register()
 {   const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
@@ -14,26 +15,27 @@ function Register()
             return;
         }
         setError("");
-        const response = await fetch(
-        "https://casino-ubcn.onrender.com/register",{method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({
-            username: username,
-            password: password
-            })
+        try
+        {
+            const response = await api.post(
+                "/register",
+                { username,password
+                }
+            );
+            setMessage(
+                response.data.message
+            );
+            setError("");
+            navigate("/");
         }
-        );  
-    const data = await response.json();
-    if(data.error)
-    {   
-        setMessage("");
-        setError(data.error);   
-    }
-    else{
-        setMessage(data.message);
-        setError("");
-        navigate("/");
-    }
+        catch(error:any)
+        {
+            setMessage("");
+            setError(
+                error.response?.data?.error
+                || "Register failed"
+            );
+        }
     }
     return (<div>
         <h1>Register</h1>

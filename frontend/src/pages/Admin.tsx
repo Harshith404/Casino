@@ -1,4 +1,5 @@
 import { useState,useEffect } from "react";
+import api from "../api/axios";
 
 type User = {
     _id: string;
@@ -13,44 +14,39 @@ function Admin()
   const [totalMoney,setTotalMoney] = useState(0);
   const [richestUser,setRichestUser] = useState("");
   const [richestBalance,setRichestBalance] = useState(0);
-   async function fetchAdminUsers(){
-        const token = localStorage.getItem("token");
-
-          const response = await fetch(
-        "https://casino-ubcn.onrender.com/admin/users",
+    async function fetchAdminUsers()
+    {
+        try
         {
-          method:"GET",
-          headers:{
-          Authorization: `Bearer ${token}`
+            const response =
+            await api.get("/admin/users");
+
+            setUsers(response.data);
         }
+        catch(error)
+        {
+            console.log(error);
         }
-      );
-      const data  = await response.json();
-      
-      setUsers(data);
-    }    
+    }  
       
     async function fetchAdminStats()
 {
-    const token = localStorage.getItem("token");
-    if(!token)
+    try
     {
-        return;
-    } 
-    const response = await fetch(
-        "https://casino-ubcn.onrender.com/admin/stats",
-        {
-            method:"GET",
-            headers:{
-                Authorization:`Bearer ${token}`
-            }
-        }
-    );
-    const data = await response.json();
-    setTotalUsers(data.totalUsers);
-    setTotalMoney(data.totalMoney);
-    setRichestUser(data.richestUser);
-    setRichestBalance(data.richestBalance);
+        const response =
+        await api.get("/admin/stats");
+
+        const data = response.data;
+
+        setTotalUsers(data.totalUsers);
+        setTotalMoney(data.totalMoney);
+        setRichestUser(data.richestUser);
+        setRichestBalance(data.richestBalance);
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
 }
 
       useEffect(() => {fetchAdminUsers();

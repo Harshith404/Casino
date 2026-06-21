@@ -1,4 +1,5 @@
 import { createContext,useContext,useState,useEffect} from "react";
+import api from "../api/axios";
 type User = {
     username: string;
     balance: number;
@@ -30,25 +31,22 @@ export function AuthProvider({children}:{
   const [user,setUser] = useState<User | null>(null);
   useEffect(() => {
     async function fetchUser()
-    {
-        const token = localStorage.getItem("token");
-        if(!token)
         {
-            return;
-        }
-        const response = await fetch(
-            "https://casino-ubcn.onrender.com/me",
+            const token = localStorage.getItem("token");
+            if(!token)
             {
-                method:"GET",
-                headers:{
-                    Authorization:`Bearer ${token}`
-                }
+                return;
             }
-        );
-        const data = await response.json();
-        setUser(data);
-    }
-
+            try
+            {
+                const response = await api.get("/me");
+                setUser(response.data);
+            }
+            catch(error)
+            {
+                setUser(null);
+            }
+        }
     fetchUser();
 
 }, []);
